@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Purpose Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Lora:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6EE;
+    --cream:#E4DECD;
+    --ink:#1E1D1B;
+    --ink-soft:#5C5A52;
+    --charcoal:#26241F;
+    --gold:#B9924B;
+    --gold-soft:#E8D9B8;
+    --line:#DDD4BE;
+    --serif:'Fraunces',serif;
+    --body:'Lora',serif;
+    --ui:'Inter',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.6;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+  .screen.active{display:flex}
+  .wrap{max-width:560px;width:100%;text-align:center}
+
+  .eyebrow{font-family:var(--ui);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;font-weight:700}
+  h1{font-family:var(--serif);font-weight:600;font-style:normal;font-size:clamp(30px,5vw,44px);line-height:1.2;letter-spacing:-.01em;color:var(--ink);margin-bottom:20px}
+  p.lead{font-size:17px;color:var(--ink-soft);margin-bottom:10px}
+  .ground-line{font-family:var(--ui);font-size:13px;font-style:italic;color:var(--ink-soft);opacity:.8;margin-bottom:22px;line-height:1.5}
+  .example-toggle{font-family:var(--ui);font-size:12.5px;color:var(--gold);text-decoration:underline;text-underline-offset:3px;margin-top:10px;display:inline-block}
+  .example-box{display:none;background:var(--cream);border-radius:6px;padding:14px 16px;margin-top:10px;text-align:left;font-size:14px;color:var(--ink-soft);font-style:italic}
+  .example-box.open{display:block}
+  .skip-link{font-family:var(--ui);font-size:13px;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px;margin-top:14px;display:inline-block}
+  .calendar-choice{display:flex;gap:14px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+  .cal-btn{padding:16px 28px;border:1px solid var(--line);border-radius:6px;background:var(--paper);font-family:var(--ui);font-size:15px;color:var(--ink)}
+  .cal-btn.selected{border-color:var(--gold);background:var(--gold-soft);font-weight:600}
+  .cal-btn:hover{border-color:var(--gold);background:var(--cream)}
+
+  button{cursor:pointer;font-family:var(--ui);border:none;background:none}
+  .btn-primary{
+    padding:15px 34px;background:var(--charcoal);color:var(--gold-soft);
+    border-radius:4px;font-size:14px;letter-spacing:.04em;font-weight:600;
+    transition:opacity .2s;margin-top:28px;
+  }
+  .btn-primary:hover{opacity:.85}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+  .btn-text{color:var(--ink-soft);font-size:13px;text-decoration:underline;text-underline-offset:3px;margin-top:16px}
+
+  /* ---------- box breathing ---------- */
+  .breath-circle{
+    width:110px;height:110px;border-radius:50%;border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;margin:30px auto 10px;
+    font-family:var(--serif);font-style:normal;font-weight:600;font-size:16px;color:var(--gold);
+    transition:transform 1s ease,border-color 1s ease,color 1s ease;
+  }
+  .breath-circle.grow{transform:scale(1.18)}
+  .breath-word{font-family:var(--ui);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-top:14px}
+  .hidden{display:none !important}
+
+  /* ---------- name / text input ---------- */
+  input[type="text"], textarea{
+    width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:4px;
+    font-family:var(--body);font-size:16px;color:var(--ink);background:var(--paper);
+    margin-top:18px;
+  }
+  input[type="text"]:focus, textarea:focus{outline:none;border-color:var(--gold)}
+
+  /* ---------- interview ---------- */
+  .progress-track{width:100%;height:3px;background:var(--line);border-radius:3px;margin-bottom:34px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .4s ease}
+  .section-transition{font-family:var(--serif);font-style:normal;font-weight:500;font-size:14px;color:var(--gold);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+  .q-main{font-family:var(--serif);font-weight:600;font-size:clamp(22px,4vw,28px);color:var(--ink);margin-bottom:14px;line-height:1.35}
+  .options{display:flex;flex-direction:column;gap:10px;text-align:left}
+  .option{
+    padding:16px 18px;border:1px solid var(--line);border-radius:6px;background:var(--paper);
+    font-family:var(--body);font-size:15.5px;color:var(--ink);text-align:left;transition:all .15s;
+  }
+  .option:hover{border-color:var(--gold);background:var(--cream)}
+  .option.selected{border-color:var(--gold);background:var(--gold-soft);font-weight:500}
+  .other-input{margin-top:4px}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:30px}
+  .back-link{font-family:var(--ui);font-size:13px;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px}
+
+  /* ---------- generating ---------- */
+  .spiral{
+    width:64px;height:64px;border-radius:50%;
+    border:2px solid var(--line);border-top-color:var(--gold);
+    animation:spin 1.1s linear infinite;margin:0 auto 26px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .gen-msg{font-family:var(--serif);font-style:normal;font-weight:500;font-size:18px;color:var(--ink-soft);transition:opacity .5s}
+
+  /* ---------- report ---------- */
+  #screen-report{align-items:flex-start;padding:0}
+  .report-cover{
+    width:100%;background:var(--charcoal);color:var(--paper);padding:70px 24px 60px;text-align:center;
+  }
+  .report-cover .eyebrow{color:var(--gold)}
+  .report-cover h1{color:var(--gold-soft);font-style:normal}
+  .report-cover .sub{font-family:var(--body);color:var(--paper);opacity:.75;font-size:15px}
+  .report-body{max-width:640px;margin:0 auto;padding:50px 24px 90px;width:100%}
+  .report-section{margin-bottom:42px;text-align:left}
+  .report-section .label{font-family:var(--ui);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:10px}
+  .report-section h2{font-family:var(--serif);font-style:normal;font-weight:600;font-size:24px;color:var(--ink);margin-bottom:14px}
+  .report-section p, .report-section li{font-size:16.5px;color:var(--ink-soft);line-height:1.75}
+  .report-section ul{padding-left:20px;margin-top:6px}
+  .divider{width:100%;height:1px;background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 12px);margin:0 0 42px}
+  .reflect-box{background:var(--cream);border-radius:6px;padding:26px}
+  .closing-block{text-align:center;padding-top:20px;border-top:1px solid var(--line)}
+  .closing-block p{font-family:var(--serif);font-style:normal;font-weight:500;font-size:19px;color:var(--ink)}
+  .bonus-panel{background:var(--cream);border-radius:8px;padding:28px 24px;margin-top:36px;text-align:left}
+  .bonus-panel h3{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--ink);margin-bottom:10px;text-align:center}
+  .bonus-panel textarea{width:100%;margin-top:12px}
+  .copy-confirm{font-family:var(--ui);font-size:13px;color:var(--gold);margin-top:10px;text-align:center;display:none}
+  .prompt-chunk{margin-bottom:16px;text-align:left}
+  .prompt-chunk .chunk-label{font-family:var(--ui);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:4px}
+  .prompt-chunk p{font-size:14px;color:var(--ink-soft);line-height:1.6}
+  .gold-line{width:60px;height:2px;background:var(--gold);margin:20px auto}
+
+  @media(max-width:480px){
+    .wrap{padding:0 4px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ WELCOME ============ -->
+<div class="screen active" id="screen-welcome">
+  <div class="wrap">
+    <svg width="86" height="86" viewBox="0 0 86 86" style="margin:0 auto 22px;display:block">
+      <circle cx="43" cy="43" r="40" fill="none" stroke="#B9924B" stroke-width="1.5"/>
+      <circle cx="43" cy="43" r="3" fill="#B9924B"/>
+      <path d="M43 43 L60 26" stroke="#B9924B" stroke-width="2" stroke-linecap="round"/>
+      <path d="M43 43 L33 55" stroke="#26241F" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+      <circle cx="60" cy="26" r="2.5" fill="#B9924B"/>
+    </svg>
+    <div class="eyebrow">Purpose Blueprint</div>
+    <h1>There are no wrong answers here.<br>Just honest ones.</h1>
+    <p class="lead">Answer as truly as you can. What comes back is a real look at what you're here to do, not a score, not a type.</p>
+    <div>
+      <button class="btn-primary" onclick="goTo('screen-ground-choice')">Begin</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GROUNDING CHOICE ============ -->
+<div class="screen" id="screen-ground-choice">
+  <div class="wrap">
+    <h1 style="font-size:26px">Want to take a minute to settle in first?</h1>
+    <p class="lead">A short breathing moment before we start. Totally optional.</p>
+    <div>
+      <button class="btn-primary" onclick="goTo('screen-breathing')">Yes, let's settle in</button>
+    </div>
+    <div>
+      <span class="skip-link" onclick="goTo('screen-name')">No, take me straight to the questions</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BREATHING (optional) ============ -->
+<div class="screen" id="screen-breathing">
+  <div class="wrap">
+    <h1 style="font-size:26px">Take a moment.</h1>
+    <div class="breath-circle" id="breath-circle"></div>
+    <div class="breath-word" id="breath-word">Breathe in</div>
+    <div id="ready-wrap" style="margin-top:20px">
+      <button class="btn-primary" onclick="stopBreathAndContinue()">I'm ready</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ NAME + EMAIL ============ -->
+<div class="screen" id="screen-name">
+  <div class="wrap">
+    <div id="nameForm">
+      <svg width="60" height="60" viewBox="0 0 60 60" style="margin:0 auto 20px;display:block">
+        <rect x="6" y="14" width="48" height="34" rx="4" fill="none" stroke="#B9924B" stroke-width="1.8"/>
+        <path d="M8 16 L30 34 L52 16" fill="none" stroke="#B9924B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1 style="font-size:26px">First name and email.</h1>
+      <p class="lead">This is so we can send you the report.</p>
+      <input type="text" id="userName" placeholder="First name">
+      <input type="text" id="userEmail" placeholder="Email address" style="margin-top:14px">
+      <div>
+        <button class="btn-primary" id="nameBtn" disabled onclick="startInterview()">Continue</button>
+      </div>
+    </div>
+    <div id="nameBlocked" class="hidden">
+      <h1 style="font-size:26px">You've already run through this twice.</h1>
+      <p class="lead">This link is good for two full runs. If you need another look at your reports, reply to your purchase email and we'll help you out.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INTERVIEW ============ -->
+<div class="screen" id="screen-interview">
+  <div class="wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="section-transition" id="sectionTransition"></div>
+    <div class="q-main" id="qMain"></div>
+    <div class="ground-line" id="groundLine"></div>
+    <div class="options" id="qOptions"></div>
+    <div class="nav-row">
+      <span class="back-link" id="backLink" onclick="goBack()">Back</span>
+      <button class="btn-primary" id="nextBtn" style="margin-top:0" disabled onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ READY ============ -->
+<div class="screen" id="screen-ready">
+  <div class="wrap">
+    <h1>Oh man. You just opened the door to your purpose.</h1>
+    <p class="lead">What you just mapped, most people spend years circling.</p>
+    <button class="btn-primary" id="reportBtn" onclick="generateReport()">Show me my Purpose Report</button>
+  </div>
+</div>
+
+<!-- ============ GENERATING ============ -->
+<div class="screen" id="screen-generating">
+  <div class="wrap">
+    <div class="spiral"></div>
+    <div class="gen-msg" id="genMsg">Reading between what you said and what you meant.</div>
+  </div>
+</div>
+
+<!-- ============ REPORT ============ -->
+<div class="screen" id="screen-report">
+  <div style="width:100%">
+    <div class="report-cover">
+      <div class="eyebrow">Purpose Blueprint</div>
+      <h1 id="reportName">...</h1>
+      <div class="sub" id="reportDirection">...</div>
+    </div>
+    <div class="report-body" id="reportBody"><!-- injected --></div>
+    <div style="text-align:center;padding-bottom:60px">
+      <button class="btn-primary" onclick="goTo('screen-calendar')">Set up my daily practice</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CALENDAR ============ -->
+<div class="screen" id="screen-calendar">
+  <div class="wrap" id="cal-frequency">
+    <h1>Your daily practice, explained</h1>
+    <p class="lead">Each entry on your calendar pairs one short quote with one small, doable step. Nothing longer than a couple minutes. The point isn't to add more to your plate, it's to keep this alive after today instead of it fading by next week.</p>
+    <p class="lead" style="margin-top:16px">How do you want to receive it?</p>
+    <div class="calendar-choice">
+      <button class="cal-btn" onclick="setFrequency('daily')">Every day, one small move</button>
+      <button class="cal-btn" onclick="setFrequency('weekly')">Three times a week</button>
+    </div>
+    <div>
+      <span class="skip-link" onclick="goTo('screen-bonus')">Skip for now</span>
+    </div>
+  </div>
+  <div class="wrap hidden" id="cal-duration">
+    <h1>How long, and what time?</h1>
+    <p class="lead">Downloads straight to your calendar.</p>
+    <div class="calendar-choice">
+      <button class="cal-btn" onclick="setDuration(30, this)">30 days</button>
+      <button class="cal-btn" onclick="setDuration(90, this)">90 days</button>
+    </div>
+    <div style="margin-top:22px;text-align:left;max-width:280px;margin-left:auto;margin-right:auto">
+      <label style="font-family:var(--ui);font-size:13px;color:var(--ink-soft);display:block;margin-bottom:6px">What time should it show up? (optional)</label>
+      <input type="time" id="calTime" style="width:100%">
+    </div>
+    <div style="margin-top:20px">
+      <button class="btn-primary" id="calGenerateBtn" onclick="finalizeCalendar()">Download my calendar</button>
+      <p style="font-family:var(--ui);font-size:12.5px;color:var(--ink-soft);margin-top:10px">A file will download. Open it and your phone or computer will offer to add it to your calendar app, Google, Apple, or Outlook all work.</p>
+    </div>
+    <div>
+      <span class="skip-link" onclick="goTo('screen-bonus')">Skip for now</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BONUS ============ -->
+<div class="screen" id="screen-bonus">
+  <div class="wrap" id="bonus-intro">
+    <h1>One more thing before you go.</h1>
+    <p class="lead">If something in the report didn't fully land, or you want to sit with it longer, there's a prompt built to take you further, with your own answers already loaded into it.</p>
+    <button class="btn-primary" onclick="revealBonus()">Ready for your extra bonus?</button>
+    <div>
+      <span class="skip-link" onclick="goTo('screen-done')">No thanks, I'm good</span>
+    </div>
+  </div>
+  <div class="wrap bonus-panel hidden" id="bonusPanel" style="max-width:560px">
+    <h3>Go deeper, on your own time</h3>
+    <label style="font-family:var(--ui);font-size:13px;color:var(--ink-soft);display:block;margin-bottom:4px">
+      Anything specific you're still confused about, or want to understand more? (optional)
+    </label>
+    <textarea id="bonusNote" rows="3" placeholder="Type it here if you've got something. Otherwise just copy the prompt below."></textarea>
+    <div style="text-align:center;margin-top:14px">
+      <button class="btn-primary" onclick="copyDeepenPrompt()">Copy my deepening prompt</button>
+      <div class="copy-confirm" id="copyConfirm">Copied. Open ChatGPT, Claude, or any AI you use, paste this in, then type "run this" so it knows to start.</div>
+    </div>
+    <div id="bonusPromptDisplay" class="hidden" style="margin-top:20px"></div>
+    <textarea id="bonusPromptText" class="hidden"></textarea>
+    <div style="text-align:center;margin-top:18px">
+      <button class="btn-primary" onclick="goTo('screen-done')">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DONE ============ -->
+<div class="screen" id="screen-done" style="align-items:flex-start;padding:0">
+  <div style="width:100%">
+    <div style="background:var(--charcoal);color:var(--paper);padding:56px 24px 40px;text-align:center">
+      <div class="eyebrow" style="color:var(--gold)">Purpose Blueprint</div>
+      <h1 style="color:var(--gold-soft)">That's everything.</h1>
+      <p style="color:var(--paper);opacity:.8;font-size:16px">You have what you came for.</p>
+    </div>
+
+    <div class="wrap" style="padding:30px 24px 0;max-width:520px">
+      <p class="lead" style="font-style:italic;text-align:center">I'm rooting for you.</p>
+    </div>
+
+    <div class="wrap" style="padding:24px;max-width:520px">
+      <div class="bonus-panel" style="margin-top:0">
+        <div class="label" style="font-family:var(--ui);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:14px">Keep this</div>
+        <button class="cal-btn" style="width:100%;margin-bottom:10px;text-align:center" onclick="window.print()">Print this report</button>
+        <button class="cal-btn" style="width:100%;text-align:center" onclick="emailMyself()">Email this to myself</button>
+      </div>
+    </div>
+
+    <div class="wrap" style="padding:0 24px 40px;max-width:520px">
+      <div class="bonus-panel" style="margin-top:0">
+        <div class="label" style="font-family:var(--ui);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:14px">What's next</div>
+        <a href="https://discovertheroot.com/purpose-next" style="display:block;text-align:center;padding:14px;background:var(--charcoal);color:var(--gold-soft);border-radius:6px;font-family:var(--ui);font-weight:600;font-size:14px;text-decoration:none;margin-bottom:10px">See what's possible next</a>
+        <a href="https://discovertheroot.com" style="display:block;text-align:center;padding:14px;border:1px solid var(--line);border-radius:6px;font-family:var(--ui);font-size:14px;color:var(--ink);text-decoration:none">See what else is here</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   BOX BREATHING
+============================================================ */
+let breathTimer, breathStep = 0;
+const breathLabels = ["Breathe in","Hold","Release","Hold"];
+
+function runBreathCycle(){
+  const circle = document.getElementById('breath-circle');
+  const word = document.getElementById('breath-word');
+  word.textContent = breathLabels[breathStep % 4];
+  circle.classList.toggle('grow', breathStep % 4 === 0);
+  breathStep++;
+  breathTimer = setTimeout(runBreathCycle, 3000);
+}
+function stopBreathAndContinue(){
+  clearTimeout(breathTimer);
+  goTo('screen-name');
+}
+
+/* ============================================================
+   RUN LIMIT — two full runs per browser, tracked locally.
+   A run counts on a completed report, never on an abandoned attempt.
+============================================================ */
+const RUN_LIMIT = 2;
+function getRunCount(){
+  const n = parseInt(localStorage.getItem('purpose_blueprint_runs'), 10);
+  return Number.isFinite(n) ? n : 0;
+}
+function runsRemaining(){
+  return Math.max(0, RUN_LIMIT - getRunCount());
+}
+function recordCompletedRun(){
+  localStorage.setItem('purpose_blueprint_runs', String(getRunCount() + 1));
+}
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'screen-breathing'){ breathStep = 0; runBreathCycle(); }
+  if (id === 'screen-name'){
+    const outOfRuns = runsRemaining() <= 0;
+    document.getElementById('nameForm').classList.toggle('hidden', outOfRuns);
+    document.getElementById('nameBlocked').classList.toggle('hidden', !outOfRuns);
+  }
+  if (id === 'screen-calendar'){
+    document.getElementById('cal-frequency').classList.remove('hidden');
+    document.getElementById('cal-duration').classList.add('hidden');
+  }
+  if (id === 'screen-bonus'){
+    document.getElementById('bonus-intro').classList.remove('hidden');
+    document.getElementById('bonusPanel').classList.add('hidden');
+  }
+  window.scrollTo(0,0);
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const JUNK_DOMAINS = ["whatever.com","test.com","fake.com","example.com","asdf.com","none.com","nomail.com","email.com","aaa.com","abc.com","test.test","fake.email","notreal.com"];
+function checkNameEmail(){
+  const name = document.getElementById('userName').value.trim();
+  const email = document.getElementById('userEmail').value.trim().toLowerCase();
+  const domain = email.split('@')[1] || '';
+  const isJunk = JUNK_DOMAINS.includes(domain);
+  document.getElementById('nameBtn').disabled = name.length === 0 || !EMAIL_PATTERN.test(email) || isJunk;
+}
+document.getElementById('userName').addEventListener('input', checkNameEmail);
+document.getElementById('userEmail').addEventListener('input', checkNameEmail);
+
+let userName = "";
+let userEmail = "";
+function startInterview(){
+  userName = document.getElementById('userName').value.trim();
+  userEmail = document.getElementById('userEmail').value.trim();
+  goTo('screen-interview');
+  renderQuestion();
+}
+
+/* ============================================================
+   QUESTION DATA
+============================================================ */
+const QUESTIONS = [
+{section:"Foundation", transition:"Let's start with where you actually are.", flag:false, id:"foundation_main",
+  main:"What do you do right now?",
+  options:["I have a job or career","I run my own business","I'm between things right now","Something else"]},
+{section:"Foundation", flag:false, id:"foundation_sub",
+  main:"What do you want more of, right now?",
+  options:["More money","More time","More peace","More connection","Something else"]},
+
+{section:"Values", transition:"Now, what actually matters to you.", flag:false, id:"values_main",
+  main:"What matters most to you?",
+  options:["Family","Freedom","Growth","Helping people","Something else"]},
+{section:"Values", flag:false, id:"values_sub",
+  main:"Pick one more, if it's close.",
+  options:["Family","Freedom","Growth","Helping people","Something else"]},
+
+{section:"Natural Role", transition:"Where you tend to stand in a room.", flag:true, id:"role_main",
+  main:"When you're part of a group project, where do you naturally end up?",
+  options:["Out front, leading and speaking","Behind the scenes, making it actually work","Off to the side, seeing what everyone else misses","Something else"]},
+{section:"Natural Role", flag:true, id:"role_sub",
+  main:"Does that feel like home, or like a costume you learned to wear?",
+  options:["Feels like home","Feels like a costume","Not sure yet"]},
+{section:"Natural Role", flag:true, id:"role_third",
+  main:"When you're not in charge, how do you feel?",
+  options:["Relieved, I like supporting instead","Restless, I want to lead","Fine either way","Something else"]},
+{section:"Natural Role", flag:true, id:"role_open", type:"open",
+  main:"In your own words, describe the moment you feel most like yourself.",
+  subs:[{prefix:"I feel most like myself when I'm", id:"role_open_a"},{prefix:"The people around me usually notice", id:"role_open_b"}],
+  example:"Example: \"I feel most like myself when I'm solving a problem nobody else wants to touch. The people around me usually notice I stay calm when things get messy.\""},
+
+{section:"Type Signal", transition:"A few quick ones about how you're wired.", flag:false, id:"type_logic",
+  main:"When you make a decision, what do you trust more?",
+  options:["What makes logical sense","What feels right in my gut","Both, depending on the situation"]},
+{section:"Type Signal", flag:false, id:"type_energy",
+  main:"After a full day around people, how do you feel?",
+  options:["Energized, I want more","Drained, I need quiet","Somewhere in between"]},
+{section:"Type Signal", flag:false, id:"type_structure",
+  main:"When plans change last minute, how do you react?",
+  options:["I adapt easily","It throws me off","Depends on the situation"]},
+
+{section:"The Spark", transition:"Let's go back further than you'd expect.", flag:true, id:"spark_main",
+  main:"When you were a kid, what could you do for hours without getting bored?",
+  options:["Making or building things","Being around people, talking, performing","Reading, thinking, figuring things out","Something else"]},
+{section:"The Spark", flag:true, id:"spark_sub",
+  main:"Did anyone ever tell you to grow out of it or be more realistic?",
+  options:["Yes, often","Yes, once or twice","No, never","Not sure"]},
+{section:"The Spark", flag:true, id:"spark_third",
+  main:"As a kid, if someone interrupted what you were doing, how did it feel?",
+  options:["Annoying, like they broke something important","No big deal","Almost a relief, honestly","Not sure"]},
+{section:"The Spark", flag:true, id:"spark_open", type:"open",
+  main:"Think back to childhood. What excited you the most? What did doing it make you feel?",
+  hint:"Not what you did, what it made you feel. Then dig one layer past the feeling, into why.",
+  skippable:false,
+  subs:[
+    {prefix:"When I would", id:"spark_open_a"},
+    {prefix:"I would feel", id:"spark_open_b"},
+    {prefix:"What made it feel that way was", id:"spark_open_c"}
+  ],
+  examples:[
+    "Example: \"When I would go ride motorcycles with my friends, I would feel unstoppable, like nothing could touch me. What made it feel that way was knowing I was in complete control of something powerful.\"",
+    "Example: \"When I would learn about organic gardening, I would feel completely absorbed, like time disappeared. What made it feel that way was watching something grow because of what I did.\""
+  ],
+  triggers:["Still not sure? Try one of these doors: outdoors and nature, building or taking things apart, animals, performing or making people laugh, solving puzzles, organizing or arranging things, caring for someone, telling stories, drawing or making things by hand."]},
+
+{section:"Strengths", transition:"What people already come to you for.", flag:false, id:"strengths_main",
+  main:"What do people already come to you for?",
+  options:["Advice when they're stuck","Getting things done","Making people feel better","Something else"]},
+{section:"Strengths", flag:false, id:"strengths_sub",
+  main:"When you help someone, how does it usually happen?",
+  options:["They ask me directly","I notice and step in","I built something they use","Something else"]},
+{section:"Strengths", flag:false, id:"strengths_third",
+  main:"What do you do that barely feels like effort, even when it's hard work?",
+  options:["Solving a tricky problem","Making something with my hands","Helping someone see something new about themselves","Something else"]},
+
+{section:"Audience", transition:"Who you picture on the other side of this.", flag:false, id:"audience_main",
+  main:"When you picture helping someone, who do you see?",
+  options:["Someone who reminds me of my past self","Someone totally different from me","I'm not sure yet, it's blurry","Something else"]},
+{section:"Audience", flag:false, id:"audience_sub",
+  main:"How many people do you want to reach?",
+  options:["One person at a time, deeply","A small group","As many as possible","Not sure yet"]},
+
+{section:"Business Fit", transition:"Whether this becomes work, or stays yours.", flag:false, id:"bizfit_main",
+  main:"Do you want this purpose to turn into income?",
+  options:["Yes, this should become my main work","Yes, but just extra income","No, this stays personal for now","Not sure yet"]},
+{section:"Business Fit", flag:false, id:"bizfit_sub",
+  main:"If it did become work, how do you picture doing it?",
+  options:["One on one with people","Teaching a group","Building something people use without me there","Not sure yet"]},
+
+{section:"Current Work", transition:"How the work you do now actually feels.", flag:false, id:"current_main",
+  main:"How do you feel about the work you do right now?",
+  options:["I like it, something's just missing","I don't like it anymore","I don't have steady work right now","Something else"]},
+{section:"Current Work", flag:false, id:"current_sub",
+  main:"If money wasn't a factor, would you still do it?",
+  options:["Yes","No","Not sure"]},
+
+{section:"Backstory", transition:"The story underneath the resume.", flag:false, id:"backstory_main",
+  main:"Growing up, what did people say you'd probably become?",
+  options:["Something practical, a stable job","Something creative","A leader or someone in charge","Nobody really said, or I don't remember"]},
+{section:"Backstory", flag:false, id:"backstory_sub",
+  dynamicMain: (ans)=> `You said people expected "${ans['backstory_main']}." Did that match what you actually wanted?`,
+  main:"Did that match what you actually wanted?",
+  options:["Yes","No","I didn't know what I wanted yet"]},
+
+{section:"Turning Points", transition:"What's shifted lately.", flag:true, id:"turning_main",
+  main:"Has something happened recently that shifted how you see your life?",
+  options:["Yes, something big","Yes, something small but real","Not recently","Something else"]},
+{section:"Turning Points", flag:true, id:"turning_sub",
+  main:"If yes, what kind of thing was it?",
+  options:["A loss or ending","A health scare","A spiritual or ceremonial experience","Something else","Prefer not to say"]},
+{section:"Turning Points", flag:true, id:"turning_third",
+  main:"Since that shift, what's changed most in how you see yourself?",
+  options:["I see what I actually want now","I see what I don't want anymore","I still feel foggy about it","Something else"]},
+{section:"Turning Points", flag:true, id:"turning_open", type:"open",
+  main:"Name one thing you do differently now than you did a year ago.",
+  hint:"Big or small counts. A habit, a boundary, a decision you'd have made differently before.",
+  subs:[{prefix:"Before, I used to", id:"turning_open_a"},{prefix:"Now, I", id:"turning_open_b"},{prefix:"The moment I noticed it change was", id:"turning_open_c"}],
+  example:"Example: \"Before, I used to say yes to everything out of guilt. Now, I actually check if I have room first. The moment I noticed it change was when I said no and nothing bad happened.\"",
+  fallback:{prompt:"Name the one thing you'd do differently, starting today.", example:"Example: \"I'd stop answering work messages after 7pm.\""}},
+
+{section:"People They Help", transition:"A real moment, not a hypothetical one.", flag:false, id:"help_main",
+  main:"Think of a real time you helped someone. What did you do?",
+  options:["Gave advice that changed something for them","Did something hands-on for them","Just listened, and it mattered","Something else"]},
+
+{section:"Moral Code", transition:"What you can't stay quiet about.", flag:false, id:"moral_main",
+  main:"What's something you can't stay quiet about?",
+  options:["When people are treated unfairly","When people give up on themselves","When people aren't honest","Something else"]},
+
+{section:"Vulnerability", transition:"The part you don't usually say out loud.", flag:true, id:"vuln_main",
+  main:"What's something you don't usually say out loud?",
+  options:["I don't know what I'm doing with my life","I'm scared I'll never figure this out","I've already figured it out, but I'm scared to start","Something else"]},
+{section:"Vulnerability", flag:true, id:"vuln_sub",
+  main:"If you never figure this out, what are you most afraid happens?",
+  options:["I stay stuck where I am","I let people down","I run out of time","Something else"]},
+{section:"Vulnerability", flag:true, id:"vuln_third",
+  main:"How often does that fear cross your mind?",
+  options:["Almost every day","Sometimes, in quiet moments","Rarely, but it hits hard when it does","Not sure"]},
+{section:"Vulnerability", flag:true, id:"vuln_open", type:"open",
+  main:"Finish this thought honestly: the thing I'm most afraid to admit about my future is...",
+  subs:[{prefix:"I'm most afraid that", id:"vuln_open_a"},{prefix:"If that fear came true, it would mean", id:"vuln_open_b"}],
+  examples:[
+    "Example: \"I'm most afraid that I'll run out of time. If that fear came true, it would mean I never actually tried.\"",
+    "Example: \"I'm most afraid that if I run out of money, I'll end up homeless. If that fear came true, it would mean I couldn't take care of myself.\"",
+    "Or go deeper than the surface fear, into the belief underneath it: \"I'm most afraid that if I really went for what I want, people would stop loving me. If that fear came true, it would mean I'm only wanted when I'm useful.\""
+  ]},
+
+{section:"Purpose", transition:"Even unfinished, what do you think you're here to do.", flag:true, id:"purpose_main",
+  main:"Even if it sounds unfinished, what do you think you're here to do?",
+  options:["I have a guess","I have a strong feeling but no words for it yet","I have no idea","Type it in"]},
+{section:"Purpose", flag:true, id:"purpose_sub",
+  main:"Where does that guess or feeling usually show up?",
+  options:["When I'm helping someone one on one","When I'm creating or building something","When I'm teaching or speaking","Not sure"]},
+{section:"Purpose", flag:true, id:"purpose_third",
+  main:"When has doing something felt the most like this is it?",
+  options:["When I was helping someone directly","When I was creating or building something","When I was teaching or explaining something","I can't remember a moment like that"]},
+{section:"Purpose", flag:true, id:"purpose_open", type:"open",
+  main:"In your own words, what brings you the most joy? When do you feel most useful, most purposeful, that spark inside?",
+  subs:[{prefix:"I feel it most when", id:"purpose_open_a"},{prefix:"In that moment, what I'm actually feeling is", id:"purpose_open_b"}],
+  examples:[
+    "Example: \"I feel it most when I'm outside playing with my kids and I see the joy on their faces. I know I'm doing something right. It feeds my soul.\"",
+    "Example: \"I feel it most when I fix something simple around the house, like a door that won't close right. Getting a small project to completion makes me feel really fulfilled.\"",
+    "Or go bigger: \"I feel it most when I imagine building something from scratch that outlives me, something my kids could point to one day and say their mom or dad made that.\""
+  ]},
+
+{section:"Business Direction", transition:"If this became work, what it might look like.", flag:false, id:"bizdir_main",
+  main:"If this became work, what would it look like?",
+  options:["Making or building things people use","Coaching or guiding people one on one","Organizing or running the systems behind something","Not sure yet"]},
+
+{section:"Shadow", transition:"What tends to get in your own way.", flag:true, id:"shadow_main",
+  main:"What tends to get in your own way?",
+  options:["I overthink instead of act","I stay small so I don't stand out","I burn out trying to do it all","Something else"]},
+{section:"Shadow", flag:true, id:"shadow_sub",
+  main:"When this pattern shows up, who usually pays for it?",
+  options:["Me, I burn out or shrink","People close to me","My work or my income","Something else"]},
+{section:"Shadow", flag:true, id:"shadow_open", type:"open",
+  main:"What is it actually costing you to not live your purpose? What is holding you back?",
+  hint:"Start small. What do you feel like you're missing out on, even in ordinary, everyday life?",
+  subs:[
+    {prefix:"What I feel like I'm missing out on is", id:"shadow_open_a"},
+    {prefix:"If that thing wasn't holding me back, life would look like", id:"shadow_open_b"}
+  ],
+  examples:[
+    "Example: \"What I feel like I'm missing out on is actually enjoying my weekends instead of dreading Monday. If that thing wasn't holding me back, life would look like waking up without that dread in my chest.\"",
+    "Example: \"What I feel like I'm missing out on is being fully present with my family instead of half there, thinking about work. If that thing wasn't holding me back, life would look like actually remembering the small moments instead of just surviving them.\""
+  ]},
+
+{section:"Action Readiness", transition:"How ready you actually feel to move.", flag:false, id:"ready_main",
+  main:"How ready do you feel to actually move on this?",
+  options:["Ready now","Ready, but scared","Not ready yet","Not sure"]},
+];
+
+const UNCERTAIN = ["Not sure","Not sure yet","Something else","I have no idea","I don't know","Prefer not to say"];
+
+let qIndex = 0;
+let answers = {};
+let followUpQueue = [];
+let inFollowUp = false;
+
+const GROUND_LINES = [
+  "There's no wrong answer here, only an honest one.",
+  "Answer like nobody's grading this, because nobody is.",
+  "Let the kid in you answer this one.",
+  "Say the true thing, even if it surprises you."
+];
+
+function renderQuestion(){
+  if (inFollowUp && followUpQueue.length){
+    renderFollowUp();
+    return;
+  }
+  const q = QUESTIONS[qIndex];
+  document.getElementById('progressFill').style.width = (inRevisit ? 97 : (qIndex/QUESTIONS.length)*100)+'%';
+  document.getElementById('sectionTransition').textContent = inRevisit ? "One more chance at this one." : (q.transition || '');
+  document.getElementById('qMain').textContent = q.dynamicMain ? q.dynamicMain(answers) : q.main;
+  document.getElementById('groundLine').textContent = q.hint || GROUND_LINES[qIndex % GROUND_LINES.length];
+  document.getElementById('backLink').style.visibility = (inRevisit || qIndex === 0) ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').disabled = true;
+
+  const optWrap = document.getElementById('qOptions');
+  optWrap.innerHTML = '';
+
+  if (q.type === 'open'){
+    if (q.subs && q.subs.length){
+      const subValues = {};
+      q.subs.forEach(sub=>{
+        const row = document.createElement('div');
+        row.style.textAlign = 'left';
+        row.style.marginBottom = '14px';
+        const label = document.createElement('label');
+        label.style.fontFamily = 'var(--ui)';
+        label.style.fontSize = '13px';
+        label.style.color = 'var(--ink-soft)';
+        label.style.display = 'block';
+        label.style.marginBottom = '6px';
+        label.textContent = sub.prefix + " ___";
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = sub.id;
+        input.placeholder = 'Finish the sentence';
+        input.addEventListener('input', function(){
+          subValues[sub.id] = this.value.trim();
+          const allFilled = q.subs.every(s => (subValues[s.id]||'').length > 0);
+          answers[q.id] = q.subs.map(s => sub.prefix ? `${s.prefix} ${subValues[s.id]||''}`.trim() : '').join('. ');
+          document.getElementById('nextBtn').disabled = !allFilled;
+        });
+        row.appendChild(label);
+        row.appendChild(input);
+        optWrap.appendChild(row);
+      });
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.rows = 3;
+      textarea.placeholder = "In your own words.";
+      textarea.id = 'openInput';
+      textarea.addEventListener('input', function(){
+        answers[q.id] = this.value.trim();
+        document.getElementById('nextBtn').disabled = this.value.trim().length === 0;
+      });
+      optWrap.appendChild(textarea);
+    }
+
+    if (q.examples && q.examples.length){
+      const toggle = document.createElement('span');
+      toggle.className = 'example-toggle';
+      toggle.textContent = 'Not sure how to answer? See examples';
+      const exBox = document.createElement('div');
+      exBox.className = 'example-box';
+      exBox.innerHTML = q.examples.map(e=>`<p style="margin-bottom:8px">${e}</p>`).join('');
+      toggle.onclick = ()=>exBox.classList.toggle('open');
+      optWrap.appendChild(toggle);
+      optWrap.appendChild(exBox);
+    } else if (q.example){
+      const toggle = document.createElement('span');
+      toggle.className = 'example-toggle';
+      toggle.textContent = 'Not sure how to answer? See an example';
+      const exBox = document.createElement('div');
+      exBox.className = 'example-box';
+      exBox.textContent = q.example;
+      toggle.onclick = ()=>exBox.classList.toggle('open');
+      optWrap.appendChild(toggle);
+      optWrap.appendChild(exBox);
+    }
+    if (q.triggers && q.triggers.length){
+      const trigToggle = document.createElement('span');
+      trigToggle.className = 'example-toggle';
+      trigToggle.style.marginLeft = '14px';
+      trigToggle.textContent = 'Blank on a memory? Try these doors';
+      const trigBox = document.createElement('div');
+      trigBox.className = 'example-box';
+      trigBox.innerHTML = q.triggers.map(t=>`<p style="margin-bottom:8px">${t}</p>`).join('');
+      trigToggle.onclick = ()=>trigBox.classList.toggle('open');
+      optWrap.appendChild(trigToggle);
+      optWrap.appendChild(trigBox);
+    }
+
+    if (q.fallback){
+      const fb = document.createElement('span');
+      fb.className = 'skip-link';
+      fb.style.display = 'block';
+      fb.style.marginTop = '14px';
+      fb.textContent = "Struggling with this one?";
+      fb.onclick = ()=>{
+        optWrap.innerHTML = '';
+        const label = document.createElement('label');
+        label.style.fontFamily = 'var(--ui)';
+        label.style.fontSize = '13px';
+        label.style.color = 'var(--ink-soft)';
+        label.style.display = 'block';
+        label.style.marginBottom = '6px';
+        label.style.textAlign = 'left';
+        label.textContent = q.fallback.prompt;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Answer here';
+        input.addEventListener('input', function(){
+          answers[q.id] = this.value.trim();
+          document.getElementById('nextBtn').disabled = this.value.trim().length === 0;
+        });
+        optWrap.appendChild(label);
+        optWrap.appendChild(input);
+        if (q.fallback.example){
+          const exNote = document.createElement('p');
+          exNote.style.fontFamily = 'var(--ui)';
+          exNote.style.fontSize = '13px';
+          exNote.style.color = 'var(--ink-soft)';
+          exNote.style.fontStyle = 'italic';
+          exNote.style.marginTop = '10px';
+          exNote.style.textAlign = 'left';
+          exNote.textContent = q.fallback.example;
+          optWrap.appendChild(exNote);
+        }
+        document.getElementById('nextBtn').disabled = true;
+      };
+      optWrap.appendChild(fb);
+    } else if (q.skippable !== false && !inRevisit){
+      const comeBack = document.createElement('span');
+      comeBack.className = 'skip-link';
+      comeBack.style.display = 'block';
+      comeBack.style.marginTop = '14px';
+      comeBack.textContent = "Not ready? Come back to this later.";
+      comeBack.onclick = ()=>{
+        if (!revisitQueue.includes(qIndex)) revisitQueue.push(qIndex);
+        nextQuestion();
+      };
+      optWrap.appendChild(comeBack);
+    }
+    return;
+  }
+
+  q.options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.onclick = ()=>selectOption(q.id, opt, btn, q.options.includes('Something else') && opt === 'Something else');
+    optWrap.appendChild(btn);
+  });
+
+  if (q.options.includes('Something else') || q.options.includes('Type it in')){
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'other-input hidden';
+    input.placeholder = 'Type your answer';
+    input.id = 'otherInput';
+    input.addEventListener('input', function(){
+      if(this.value.trim().length){
+        answers[q.id] = this.value.trim();
+        document.getElementById('nextBtn').disabled = false;
+      }
+    });
+    optWrap.appendChild(input);
+  }
+}
+
+function selectOption(qid, opt, btn, showOther){
+  document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[qid] = opt;
+  document.getElementById('nextBtn').disabled = false;
+  const other = document.getElementById('otherInput');
+  if (other){
+    other.classList.toggle('hidden', !showOther);
+    if(showOther){ document.getElementById('nextBtn').disabled = true; }
+  }
+}
+
+let revisitQueue = [];
+let inRevisit = false;
+const GENERIC_FILLERS = ["Not sure","Not sure yet","Something else","I have no idea","I don't know","Prefer not to say"];
+
+function nextQuestion(){
+  if (inFollowUp && followUpQueue.length){
+    advanceFollowUp();
+    return;
+  }
+  if (inRevisit){
+    advanceRevisit();
+    return;
+  }
+  const q = QUESTIONS[qIndex];
+  if (q.flag && UNCERTAIN.includes(answers[q.id])){
+    followUpQueue.push({parent:q.id, section:q.section, rawAnswer:answers[q.id]});
+  }
+  qIndex++;
+  if (qIndex >= QUESTIONS.length){
+    proceedPastMainFlow();
+    return;
+  }
+  renderQuestion();
+}
+
+function proceedPastMainFlow(){
+  if (followUpQueue.length){
+    inFollowUp = true;
+    renderQuestion();
+  } else if (revisitQueue.length){
+    startRevisit();
+  } else {
+    goTo('screen-ready');
+  }
+}
+
+function startRevisit(){
+  inRevisit = true;
+  qIndex = revisitQueue[0];
+  renderQuestion();
+}
+
+function advanceRevisit(){
+  revisitQueue.shift();
+  if (revisitQueue.length){
+    qIndex = revisitQueue[0];
+    renderQuestion();
+  } else {
+    inRevisit = false;
+    if (followUpQueue.length){
+      inFollowUp = true;
+      renderQuestion();
+    } else {
+      goTo('screen-ready');
+    }
+  }
+}
+
+const FOLLOWUP_BY_SECTION = {
+  "Natural Role": {q:(a)=>GENERIC_FILLERS.includes(a) ? "That's alright, a lot of people aren't sure at first. In your own words, when do you feel most useful in a group?" : `You said "${a}." In your own words, when do you feel most useful in a group?`, ex:"Example: \"When my family needs someone to figure out dinner for a big group and nobody else steps up but me.\""},
+  "The Spark": {q:(a)=>GENERIC_FILLERS.includes(a) ? "That's alright. In your own words, what's one thing you loved doing before anyone told you to be realistic?" : `You said "${a}." In your own words, what's one thing you loved doing before anyone told you to be realistic?`, ex:"Example: \"I used to take apart anything with a motor just to see how it worked.\""},
+  "Turning Points": {q:(a)=>GENERIC_FILLERS.includes(a) ? "That's alright. In your own words, what's one small thing that feels different lately, even if you can't fully explain why?" : `You said "${a}." In your own words, what's one small thing that feels different lately, even if you can't fully explain why?`, ex:"Example: \"I stopped needing to have all the answers before I speak up in meetings.\""},
+  "Vulnerability": {q:(a)=>GENERIC_FILLERS.includes(a) ? "That's honest, that fear is common. In your own words, what would it mean for you if this fear never went away?" : `You said "${a}." In your own words, what would it mean for you if this fear never went away?`, ex:"Example: \"It would mean I spent my whole life playing it safe and never found out what I was actually capable of.\""},
+  "Purpose": {q:(a)=>GENERIC_FILLERS.includes(a) ? "That's honest, and common. In your own words, name one moment that's ever felt close to meaningful, even for a second." : `You said "${a}." In your own words, name one moment that's ever felt close to meaningful, even for a second.`, ex:"Example: \"Helping my neighbor rewrite his resume and watching him actually get the callback a week later.\""},
+  "Shadow": {q:(a)=>GENERIC_FILLERS.includes(a) ? "That's alright. In your own words, what's the pattern that keeps showing up no matter what you try?" : `You said "${a}." In your own words, what's the pattern that keeps showing up no matter what you try?`, ex:"Example: \"I say yes to helping with school fundraisers every single time, then quietly resent it for weeks.\""}
+};
+
+function renderFollowUp(){
+  const fu = followUpQueue[0];
+  const fallbackDetail = {q:()=>"In your own words, tell me a little more about " + fu.section.toLowerCase() + ".", ex:""};
+  const detail = FOLLOWUP_BY_SECTION[fu.section] || fallbackDetail;
+  document.getElementById('progressFill').style.width = '96%';
+  document.getElementById('sectionTransition').textContent = 'One more thing, on ' + fu.section + '.';
+  document.getElementById('qMain').textContent = detail.q(fu.rawAnswer);
+  document.getElementById('groundLine').textContent = '';
+  document.getElementById('backLink').style.visibility = 'hidden';
+  const optWrap = document.getElementById('qOptions');
+  optWrap.innerHTML = '';
+  const textarea = document.createElement('textarea');
+  textarea.rows = 3;
+  textarea.placeholder = "A sentence or two is plenty.";
+  textarea.id = 'followUpInput';
+  textarea.addEventListener('input', function(){
+    document.getElementById('nextBtn').disabled = this.value.trim().length === 0;
+  });
+  optWrap.appendChild(textarea);
+  if (detail.ex){
+    const toggle = document.createElement('span');
+    toggle.className = 'example-toggle';
+    toggle.textContent = 'Not sure how to answer? See an example';
+    const exBox = document.createElement('div');
+    exBox.className = 'example-box';
+    exBox.textContent = detail.ex;
+    toggle.onclick = ()=>exBox.classList.toggle('open');
+    optWrap.appendChild(toggle);
+    optWrap.appendChild(exBox);
+  }
+  document.getElementById('nextBtn').disabled = true;
+}
+
+function advanceFollowUp(){
+  const fu = followUpQueue.shift();
+  const val = document.getElementById('followUpInput').value.trim();
+  answers[fu.parent + '_followup'] = val;
+  if (followUpQueue.length){
+    renderFollowUp();
+  } else {
+    inFollowUp = false;
+    goTo('screen-ready');
+  }
+}
+
+function goBack(){
+  if (qIndex > 0){
+    qIndex--;
+    renderQuestion();
+  }
+}
+
+/* ============================================================
+   DAILY PRACTICE CALENDAR
+============================================================ */
+const DAILY_PAIRS = [
+  {quote:"Purpose becomes clearer when you move.", action:"Write one sentence about who you want to help."},
+  {quote:"You are not behind. You are gathering evidence.", action:"Send one helpful message to someone today."},
+  {quote:"Action turns insight into direction.", action:"Spend 10 minutes building your offer."},
+  {quote:"The smallest step can interrupt the oldest pattern.", action:"Record a 2 minute reflection on what you noticed today."},
+  {quote:"Clarity is a result of motion, not thought.", action:"Tell one person what you're working toward."},
+  {quote:"You don't need the whole staircase, just the next step.", action:"Do the smallest version of today's task, on purpose."},
+  {quote:"What you practice, you become.", action:"Repeat yesterday's step, even if it felt small."},
+  {quote:"Doubt is loud right before a shift.", action:"Write down one thing doubt is trying to protect you from."},
+  {quote:"Nobody finds their purpose sitting still.", action:"Do one uncomfortable, useful thing today."},
+  {quote:"The work reveals the way, not the other way around.", action:"Start before you feel ready. Ten minutes counts."},
+  {quote:"Your inner child called. It wants to know why you stopped.", action:"Do one thing today just because it's fun."},
+  {quote:"Overthinking burns more calories than doing the thing would.", action:"Pick the first option and go with it, no more comparing."},
+  {quote:"Nobody ever regretted the ten minutes they actually spent.", action:"Set a timer for 10 minutes and start."},
+  {quote:"You are allowed to enjoy this. Weird, I know.", action:"Notice one moment today that felt like play, not work."},
+  {quote:"Future you is watching. Try not to disappoint them, but also, relax.", action:"Do the next small thing, then stop and rest."}
+];
+
+let practiceFrequency = 'daily';
+let practiceDuration = 30;
+
+function setFrequency(freq){
+  practiceFrequency = freq;
+  document.getElementById('cal-frequency').classList.add('hidden');
+  document.getElementById('cal-duration').classList.remove('hidden');
+}
+function setDuration(days, btn){
+  practiceDuration = days;
+  document.querySelectorAll('#cal-duration .cal-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function pad(n){ return n < 10 ? '0'+n : ''+n; }
+function formatICSDate(d){
+  return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate());
+}
+function formatICSDateTime(d){
+  return formatICSDate(d) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
+}
+function icsTimestampUTC(){
+  const d = new Date();
+  return d.getUTCFullYear() + pad(d.getUTCMonth()+1) + pad(d.getUTCDate())
+    + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
+}
+/* Commas, semicolons and backslashes are field separators in an ICS TEXT value,
+   so an unescaped one silently truncates the description. */
+function escapeICS(s){
+  return String(s)
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\r?\n/g, '\\n');
+}
+
+function finalizeCalendar(){
+  const days = practiceDuration;
+  const timeVal = document.getElementById('calTime').value;
+  const events = [];
+  const today = new Date();
+  const stamp = icsTimestampUTC();
+  const step = practiceFrequency === 'weekly' ? 2 : 1;
+  let dayOffset = 1;
+  let pairIndex = 0;
+  const totalEvents = practiceFrequency === 'weekly' ? Math.round(days * 3/7) : days;
+
+  for (let i = 0; i < totalEvents; i++){
+    const day = new Date(today);
+    day.setDate(today.getDate() + dayOffset);
+    const pair = DAILY_PAIRS[pairIndex % DAILY_PAIRS.length];
+    const dateStr = formatICSDate(day);
+    const nextDay = new Date(day);
+    nextDay.setDate(day.getDate()+1);
+    const nextDateStr = formatICSDate(nextDay);
+
+    let dtStart, dtEnd, alarmTrigger;
+    if (timeVal){
+      const [hh, mm] = timeVal.split(':').map(Number);
+      const start = new Date(day);
+      start.setHours(hh, mm, 0, 0);
+      const end = new Date(start.getTime() + 15*60*1000);
+      dtStart = 'DTSTART:' + formatICSDateTime(start);
+      dtEnd = 'DTEND:' + formatICSDateTime(end);
+      alarmTrigger = 'PT0S';
+    } else {
+      dtStart = 'DTSTART;VALUE=DATE:' + dateStr;
+      dtEnd = 'DTEND;VALUE=DATE:' + nextDateStr;
+      alarmTrigger = 'PT9H';
+    }
+
+    events.push([
+      'BEGIN:VEVENT',
+      'UID:purpose-blueprint-' + i + '-' + stamp + '@discovertheroot.com',
+      'DTSTAMP:' + stamp,
+      dtStart,
+      dtEnd,
+      'SUMMARY:' + escapeICS('Purpose Practice: Take Your Micro Step'),
+      'DESCRIPTION:' + escapeICS(pair.quote + '\n\nToday\'s step: ' + pair.action),
+      'BEGIN:VALARM',
+      'ACTION:DISPLAY',
+      'DESCRIPTION:' + escapeICS('Purpose Practice'),
+      'TRIGGER;RELATED=START:' + alarmTrigger,
+      'END:VALARM',
+      'END:VEVENT'
+    ].join('\r\n'));
+    pairIndex++;
+    dayOffset += step;
+  }
+  /* RFC 5545 requires CRLF line endings; bare \n is rejected by stricter
+     phone calendar parsers. */
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Discover the Root//Purpose Blueprint//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH'
+  ].concat(events, ['END:VCALENDAR']).join('\r\n') + '\r\n';
+
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `purpose-practice-${days}-days.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  goTo('screen-bonus');
+}
+
+const genMessages = [
+  "Reading between what you said and what you meant.",
+  "Finding where the pattern repeats.",
+  "Connecting the spark to the work.",
+  "Putting language to what you already know."
+];
+
+let reportAlreadyGenerated = false;
+
+function generateReport(){
+  if (reportAlreadyGenerated){
+    goTo('screen-done');
+    return;
+  }
+  reportAlreadyGenerated = true;
+  goTo('screen-generating');
+  let i = 0;
+  const msgEl = document.getElementById('genMsg');
+  const cycle = setInterval(()=>{
+    i = (i+1) % genMessages.length;
+    msgEl.style.opacity = 0;
+    setTimeout(()=>{ msgEl.textContent = genMessages[i]; msgEl.style.opacity = 1; }, 400);
+  }, 2600);
+
+  callSynthesis().then(report=>{
+    clearInterval(cycle);
+    recordCompletedRun();
+    renderReport(report);
+    saveReportState();
+    goTo('screen-report');
+  }).catch(err=>{
+    clearInterval(cycle);
+    reportAlreadyGenerated = false;
+    msgEl.textContent = "Something interrupted this. Let's try again.";
+    setTimeout(()=>{
+      goTo('screen-ready');
+    }, 2500);
+    console.error(err);
+  });
+}
+
+const MASTER_PROMPT = `You are generating a Purpose Blueprint report for one person, based on their interview answers.
+
+ABOUT THE PRACTICE THIS COMES FROM:
+This report is produced under Discover the Root, a root cause transformation practice founded by Tisha, who has 15+ years of practice and 5,000+ client hours, and is trained in Compassionate Inquiry. The clinical foundation underneath everything you write is going underneath the story to the belief driving it. You are not a generic AI analysis, you are channeling this specific, grounded methodology. Write like it.
+
+THE EVIDENCE LOOP, THE CORE FRAMEWORK UNDERNEATH THIS ENTIRE REPORT:
+Most people carry a small number of core beliefs about themselves formed early in life, often around worth, safety, belonging, or capability. Without realizing it, they spend years unconsciously collecting evidence that proves these beliefs true, even when the belief was never fully accurate. This is the Evidence Loop. Purpose gets tangled inside this loop constantly, chasing a big enough purpose can quietly become another way of trying to disprove an old belief, instead of just being who someone already is. When you write this report, actively look for where the person's Evidence Loop may be shaping their answers, especially in Protective Pattern, Current Cost, and Shadow-adjacent findings, and let that shape the diagnosis without ever naming the framework itself in the output.
+
+IF SOMETHING IS UNCLEAR:
+If an answer is genuinely too thin or contradictory to draw a confident conclusion from, say so honestly within the relevant section rather than inventing certainty. A brief honest acknowledgment of ambiguity is always better than a confident guess presented as fact.
+
+PANEL (reference only, never mention these names in output):
+Donald Miller and Teresa Torres on Story and Trust, ground every claim in what they actually said.
+Carl Rogers on Alignment, meet them accurately, never diagnose.
+Viktor Frankl on Meaning, point to what makes the work matter, not just what they're good at.
+Carl Jung and Carol Pearson on Archetype and Shadow, name the pattern, never pathologize it.
+Dale Carnegie on Communication, never make the reader wrong.
+Gay Hendricks on Zone of Genius, distinguish effortless skill from merely useful skill.
+James Hillman on The Spark, trace the current pull back to what lit them up before life got practical.
+Clayton Christensen and April Dunford on Business Fit, frame around the real job being hired for.
+BJ Fogg and Peter Gollwitzer on Action Architecture, every action step must be small enough to happen this week.
+Alex Hormozi simplifies the sharpest insight in Closing to one clean, plain sentence.
+Joanna Wiebe on Voice of Customer, the writer who handles their own words.
+
+VOICE OF CUSTOMER RULE (Joanna Wiebe seat), mandatory wherever an open text answer is quoted or referenced:
+Never paste the person's raw words unedited, and never fully rewrite them into generic language either. Lightly smooth grammar and clarity only. Keep their actual vocabulary, phrasing, and sentence rhythm intact. Target roughly 35 percent of their original words surviving verbatim in any section that draws on their open answers, this is a working target to be tuned against real results, not a fixed law. The person must recognize it as their own words, polished, not replaced. Keep length within about 20 percent of what they wrote.
+
+SPARK TO PURPOSE RULE (Hillman and Frankl seats together), mandatory:
+The report must explicitly name the throughline between what lit them up as a child (The Spark) and where their direction points now. This connection should feel like a genuine discovery, energized and a little delighted, not just accurate. This is the moment the report should feel most alive. Never skip this connection even if the two seem unrelated on the surface, the panel's job is to find the real thread.
+
+PURPOSE GROUNDING RULE, critical, applies to every section:
+Purpose often gets tangled with worth. People chase a grand, destined sounding purpose because somewhere their sense of worth got tied to having one, which traces back to a limiting belief, which the ego then inflates into a big enough reason to matter. This report must never feed that loop. Never claim the person has a special, grand, or destined purpose. Never imply their worth depends on the size or importance of what was found here. Ground every claim in something small, real, specific, and effortless, the actual thing that doesn't feel like work to them, not a proclamation about their significance. The win is recognition of something true and usable, not an ego inflating destiny statement. If a sentence would sound impressive read aloud at a stage event, rewrite it smaller and more specific until it sounds like something only this person would recognize as theirs.
+
+WEIGHTED SIGNAL RULE:
+Natural Role, The Spark, Purpose, Business Fit, and Shadow answers carry the most weight in determining strongest_signals and direction_suggested. Foundation, Values, Audience, Current Work, Backstory, People They Help, Moral Code, and Business Direction are supporting color, used to add specificity, not to override the weighted sections.
+
+UNEXPECTED POSSIBILITIES RULE:
+Beyond reflecting back what they explicitly said, use Business Fit (Christensen, Dunford) and Zone of Genius (Hendricks) reasoning to name 2 to 3 concrete directions or roles the person did not explicitly name, but that their combined signals point toward. These should feel like a real, specific option they hadn't considered, not a vague encouragement.
+
+TYPE SIGNAL NOTE:
+The type_logic, type_energy, and type_structure answers are a light real signal (decision style, social energy, structure preference). Use them only to inform tone and phrasing choices in the report, for example whether to lead with logic or feeling language. Never name a typology system or label the person with a type in the output.
+
+BUSINESS FIT NOTE:
+who_you_help does not require direct interpersonal helping. It may be indirect, through what they build, make, or organize. Not everyone's purpose is coaching or speaking. Building, making, and running systems are equally valid and should never be treated as lesser paths.
+
+BUFFER RULE, mandatory for protective_pattern and current_cost:
+Raw finding states what the evidence shows, plainly. Buffer pass rephrases it as recognition, never diagnosis. Only ship the buffered version.
+Example. Raw: "You avoid visibility because you fear rejection." Buffered: "You've built real skill working behind the scenes. Part of you may be wondering what happens if you stepped forward instead."
+
+TONE NOTE:
+The reader should close this report feeling inspired, full of real ideas about their own life, and closer to knowing who they actually are, not just informed. That is the actual success condition for this product, not accuracy alone. The hard sections (protective_pattern, current_cost) stay buffered and grounded. Everything else should feel like genuinely good, specific news being delivered by someone who's excited for the reader, never generic uplift, never a grand destiny claim.
+
+QUALITY GATES:
+No banned words: gap, rebranding, revolutionize, cutting edge, embark, facilitate, deep dive, unpack, leverage, bandwidth, thought leader, scalable, touch base, drill down, seamless, foster, actionable, curated, resonates, navigate, game changer, elevate, skyrocket, tailor, delve, paradigm shift, certainly, importantly, narrative, alignment, robust, synergy, streamline, innovative, value proposition, no fluff, growth, transformation.
+Never use em dashes anywhere in the output, no exceptions. Use periods or commas instead. No dashes connecting words either. No panel names anywhere in output. No fabricated specifics beyond what they answered. Third grade reading level throughout. Closing ends warm, in the voice "I'm rooting for you" or a close equivalent.
+
+Respond with valid JSON only, no preamble, no markdown fences, matching exactly this schema:
+{"opening_reflection":"string, 100-150 words","strongest_signals":["string","string","string"],"direction_suggested":"string, 20-40 words","spark_throughline":"string, 80-120 words, the connection between childhood spark and current direction, energized tone","natural_role":"string, 100-150 words","who_you_help":"string, 100-150 words","problem_you_solve":"string, 60-90 words","story_thread":"string, 180-260 words","protective_pattern":"string, buffered, 120-180 words","how_it_helped":"string, 100-150 words","current_cost":"string, buffered, 100-140 words","business_direction":"string, 140-200 words","unexpected_possibilities":["string","string","string"],"thirty_day_experiment":"string, 40-70 words","micro_to_macro_plan":["string","string","string"],"reflection_questions":["string","string","string"],"closing":"string, 60-90 words, ends with sign off"}`;
+
+async function callSynthesis(){
+  const response = await fetch('/api/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      max_tokens: 4096,
+      messages: [
+        { role: "user", content: MASTER_PROMPT + "\n\nPERSON'S NAME: " + userName + "\n\nINTERVIEW ANSWERS:\n" + JSON.stringify(answers, null, 2) }
+      ]
+    })
+  });
+  const data = await response.json();
+  const textBlock = data.content.find(c => c.type === "text");
+  const cleaned = textBlock.text.replace(/```json|```/g,'').trim();
+  return JSON.parse(cleaned);
+}
+
+/* ============================================================
+   RENDER REPORT
+============================================================ */
+let currentReport = null;
+
+/* ============================================================
+   REPORT PERSISTENCE
+   Saves the finished report so a buyer can close the tab and come
+   back to it later. Declared AFTER currentReport on purpose: the
+   restore block assigns it, and reading it before the `let` above
+   would throw a temporal-dead-zone error.
+============================================================ */
+function saveReportState(){
+  try {
+    localStorage.setItem('purpose_report_state', JSON.stringify({
+      userName: userName,
+      userEmail: userEmail,
+      report: currentReport
+    }));
+  } catch(e){}
+}
+
+function restoreSavedReport(){
+  try {
+    const saved = localStorage.getItem('purpose_report_state');
+    if (!saved) return;
+    const state = JSON.parse(saved);
+    if (!state || !state.report) return;
+    userName = state.userName || "";
+    userEmail = state.userEmail || "";
+    renderReport(state.report);
+    goTo('screen-report');
+  } catch(e){}
+}
+
+/* Deferred, not run at parse time: goTo mutates screen classes, and doing
+   that mid-parse is unreliable. Wait until the DOM has settled. */
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', restoreSavedReport);
+} else {
+  restoreSavedReport();
+}
+
+function renderReport(r){
+  currentReport = r;
+  document.getElementById('reportName').textContent = userName + "'s Purpose Blueprint";
+  document.getElementById('reportDirection').textContent = r.direction_suggested;
+
+  const body = document.getElementById('reportBody');
+  body.innerHTML = `
+    ${section("Opening Reflection", r.opening_reflection)}
+    ${sectionList("Strongest Signals", r.strongest_signals)}
+    ${sparkSection(r.spark_throughline)}
+    ${section("Natural Role", r.natural_role)}
+    ${section("Who You Help", r.who_you_help)}
+    ${section("Problem You Solve", r.problem_you_solve)}
+    ${section("Story Thread", r.story_thread)}
+    ${section("Protective Pattern", r.protective_pattern)}
+    ${section("How It Helped", r.how_it_helped)}
+    ${section("Current Cost", r.current_cost)}
+    ${section("Business Direction", r.business_direction)}
+    ${sectionList("Possibilities You Haven't Considered", r.unexpected_possibilities)}
+    ${section("30-Day Experiment", r.thirty_day_experiment)}
+    ${sectionList("Micro-to-Macro Plan", r.micro_to_macro_plan)}
+    <div class="reflect-box">${sectionList("Reflection Questions", r.reflection_questions, true)}</div>
+    <div class="divider" style="margin-top:42px"></div>
+    <div class="closing-block">
+      <p>${r.closing}</p>
+      <div class="gold-line"></div>
+      <p style="font-family:var(--ui);font-size:14px;color:var(--ink-soft);margin-top:24px">
+        <a href="https://discovertheroot.com/purpose-next" style="color:var(--gold);font-weight:600">See what's possible next</a>.
+      </p>
+    </div>
+  `;
+}
+
+function revealBonus(){
+  document.getElementById('bonus-intro').classList.add('hidden');
+  document.getElementById('bonusPanel').classList.remove('hidden');
+}
+
+function section(label, text){
+  const firstPeriod = text.indexOf('. ');
+  let formatted = text;
+  if (firstPeriod > 0 && firstPeriod < 140){
+    formatted = `<strong>${text.slice(0, firstPeriod+1)}</strong>${text.slice(firstPeriod+1)}`;
+  }
+  return `<div class="report-section"><div class="label">${label}</div><p>${formatted}</p></div><div class="divider"></div>`;
+}
+function sparkSection(text){
+  return `<div class="report-section" style="text-align:center">
+    <svg width="120" height="60" viewBox="0 0 120 60" style="margin:0 auto 18px;display:block">
+      <circle cx="18" cy="30" r="5" fill="#B9924B"/>
+      <path d="M18 30 L18 20 M18 30 L10 24 M18 30 L26 24" stroke="#B9924B" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M28 30 Q60 5 92 30" fill="none" stroke="#DDD4BE" stroke-width="1.5" stroke-dasharray="3,4"/>
+      <circle cx="100" cy="30" r="9" fill="none" stroke="#B9924B" stroke-width="1.8"/>
+      <path d="M100 30 L106 24" stroke="#B9924B" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div class="label">Then and Now</div>
+    <p>${text}</p>
+  </div><div class="divider"></div>`;
+}
+function sectionList(label, arr, noDivider){
+  const items = arr.map(i=>`<li>${i}</li>`).join('');
+  return `<div class="report-section"><div class="label">${label}</div><ul>${items}</ul></div>${noDivider ? '' : '<div class="divider"></div>'}`;
+}
+
+/* ============================================================
+   BONUS DEEPENING PROMPT
+============================================================ */
+function buildDeepenPrompt(){
+  const r = currentReport;
+  const note = document.getElementById('bonusNote').value.trim();
+
+  const context = `
+MY NAME: ${userName}
+
+MY PURPOSE BLUEPRINT FINDINGS:
+Direction: ${r.direction_suggested}
+Then and Now: ${r.spark_throughline}
+Natural Role: ${r.natural_role}
+Who I Help: ${r.who_you_help}
+Business Direction: ${r.business_direction}
+Possibilities I Haven't Considered: ${r.unexpected_possibilities.join(' | ')}
+Protective Pattern: ${r.protective_pattern}
+What This Is Costing Me: ${r.current_cost}
+
+MY OWN WORDS FROM THE INTERVIEW:
+The Spark: ${answers['spark_open'] || ''}
+Purpose: ${answers['purpose_open'] || ''}
+Vulnerability: ${answers['vuln_open'] || ''}
+Shadow: ${answers['shadow_open'] || ''}
+${note ? '\nWHAT I\'M STILL CONFUSED ABOUT OR WANT TO UNDERSTAND MORE: ' + note : ''}
+`.trim();
+
+  const chunks = [
+    {label:"The job", text:"I have already completed a full interview and already received my Purpose Blueprint report. Everything from that process is provided below as already known, settled fact. Do not ask me any of the interview questions again, not the ones about my values, my role, my childhood, my work, or anything else already answered below. Do not repeat the report back to me either, I've already read it. Your only job is to help me go deeper on what's still unclear or unresolved, using what's below as your starting point, not your first step."},
+    {label:"Who this draws from", text:"Draw on real, established thinking as you do this: Viktor Frankl on meaning being found through action, Carl Rogers on meeting someone accurately instead of diagnosing them, James Hillman on a calling often showing up early in life before it gets buried by practicality, Gay Hendricks on the difference between being good at something and it actually being effortless for you, and Byron Katie's method of questioning a belief by asking what's actually true. You don't need to name these people to me while we talk, just let their thinking shape how you listen and what you ask."},
+    {label:"How to listen", text:"Listen for what's underneath what I say, not just the words themselves. If I go quiet, rush past something, get vague, or deflect with a joke, gently slow down and ask about that specific moment instead of moving on."},
+    {label:"The Evidence Loop", text:"Most people carry a core belief about themselves formed early on, and without realizing it, they've spent years collecting evidence that proves that belief true, even when it was never fully accurate. Purpose work often gets pulled into this loop, chasing a big enough purpose can quietly become another way of trying to disprove that old belief, instead of just being who I already am. If you notice me trying to prove something rather than simply describing something true, name that gently and ask about it."},
+    {label:"Ego versus purpose", text:"These are not the same thing. Ego-driven answers tend to be about needing to be seen, needing to matter, needing to prove something. Real purpose tends to feel quiet and true even if no one ever noticed or praised it. If an answer sounds like it's about being validated, ask me: would this still feel true and worth doing if no one ever found out about it? That question tells the two apart."},
+    {label:"Purpose versus money", text:"These get confused constantly, and they are not the same thing either. As we talk, ask me directly: am I actually trying to find my purpose, or am I trying to find a way to make money doing something that just feels content and comfortable? Not everything that gives me a sense of purpose has to be something I get paid for. I might do paid work I genuinely enjoy, and still find my deepest sense of purpose somewhere completely unpaid, a hobby, a volunteer thing, something I'd do even if it never made a cent. Help me see whether my purpose and my income actually need to be the same thing, or whether they're two separate parts of my life that don't need to be merged."},
+    {label:"Belief check", text:"If I say something that sounds like a limiting belief about my own worth, question that belief the way you'd question any assumption, by asking what's actually true, not by arguing with me."},
+    {label:"Never do this", text:"Never tell me I have a special, grand, or destined purpose. That's often just the ego loop wearing a nicer outfit. Ground everything in what's small, real, and specific, the actual thing that doesn't feel like work when I'm doing it."},
+    {label:"Pace", text:"Go one question at a time. Wait for my answer before asking the next. Never give me a list of questions at once. If I mentioned something I'm still confused about, start there first. Your first question should build on what's already known below, never start over from the beginning."},
+    {label:"Before we wrap up", text:"Near the end of our conversation, ask me directly if I have any clarifying questions, or if there's anything else that would help me find my purpose that we haven't covered yet."},
+    {label:"If this doesn't fully work", text:"If, after real back and forth, I still feel stuck, tell me plainly that some things go deeper than AI can reach, and that it's a real option to talk to an actual person, not a failure to need that. Suggest I book a call at discovertheroot.com/work-with-me."}
+  ];
+
+  const instructions = chunks.map(c => c.label.toUpperCase() + ':\n' + c.text).join('\n\n') + `\n\nHere is my context:\n\nYOUR FIRST MESSAGE TO ME:\nDo not ask a deep question yet. First, ask me plainly where I still feel confused or stuck, and give me a few concrete options to choose from, something like: am I confused about what I actually want to do, am I confused about my own pattern, or am I confused about how to turn my purpose into money. Let me pick one of those, or tell you it's something else entirely. Once I answer, go deeper on exactly that, using everything above to guide how you dig in.\n\n${context}`;
+
+  const displayEl = document.getElementById('bonusPromptDisplay');
+  displayEl.innerHTML = chunks.map(c => `<div class="prompt-chunk"><div class="chunk-label">${c.label}</div><p>${c.text}</p></div>`).join('');
+  displayEl.classList.remove('hidden');
+
+  const textBox = document.getElementById('bonusPromptText');
+  textBox.value = instructions;
+
+  navigator.clipboard.writeText(instructions).then(()=>{
+    document.getElementById('copyConfirm').textContent = "Copied. Open ChatGPT, Claude, or any AI you use, paste this in, then type \"run this\" so it knows to start. It's also shown below if you need it again.";
+    document.getElementById('copyConfirm').style.display = 'block';
+  }).catch(()=>{
+    textBox.select();
+    document.getElementById('copyConfirm').textContent = "Couldn't copy automatically. The prompt is selected below, just press Ctrl+C or Cmd+C.";
+    document.getElementById('copyConfirm').style.display = 'block';
+  });
+}
+function copyDeepenPrompt(){
+  buildDeepenPrompt();
+}
+
+function emailMyself(){
+  const r = currentReport;
+  const subject = encodeURIComponent("My Purpose Blueprint Report");
+  const body = encodeURIComponent(
+`${userName}'s Purpose Blueprint
+
+Direction: ${r.direction_suggested}
+
+${r.closing}
+
+I'm rooting for you.`
+  );
+  window.location.href = `mailto:${userEmail}?subject=${subject}&body=${body}`;
+}
+</script>
+</body>
+</html>
