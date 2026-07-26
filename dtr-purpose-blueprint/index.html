@@ -121,14 +121,47 @@
   .bonus-panel{background:var(--cream);border-radius:8px;padding:28px 24px;margin-top:36px;text-align:left}
   .bonus-panel h3{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--ink);margin-bottom:10px;text-align:center}
   .bonus-panel textarea{width:100%;margin-top:12px}
-  .copy-confirm{font-family:var(--ui);font-size:13px;color:var(--gold);margin-top:10px;text-align:center;display:none}
-  .prompt-chunk{margin-bottom:16px;text-align:left}
-  .prompt-chunk .chunk-label{font-family:var(--ui);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:4px}
-  .prompt-chunk p{font-size:14px;color:var(--ink-soft);line-height:1.6}
+  .copy-confirm{font-family:var(--ui);font-size:13.5px;color:var(--gold);margin-top:12px;text-align:center;display:none;line-height:1.5}
+  .copy-confirm.show{display:block}
+  .deepen-steps{margin:6px 0 20px;padding-left:22px;text-align:left}
+  .deepen-steps li{font-family:var(--body);font-size:15.5px;color:var(--ink-soft);line-height:1.55;margin-bottom:10px}
+  .deepen-steps li strong{color:var(--ink)}
+  .deepen-note-label{font-family:var(--ui);font-size:13px;color:var(--ink-soft);display:block;margin-bottom:2px}
+  .deepen-box-label{font-family:var(--ui);font-size:12.5px;color:var(--ink-soft);margin:22px 0 6px;text-align:left}
+  .deepen-prompt-box{width:100%;min-height:150px;font-family:var(--ui);font-size:13px;line-height:1.55;color:var(--ink-soft);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:12px 14px;resize:vertical}
   .gold-line{width:60px;height:2px;background:var(--gold);margin:20px auto}
 
   @media(max-width:480px){
     .wrap{padding:0 4px}
+  }
+
+  /* ============================================================
+     PRINT
+     Without this, window.print() only prints whichever screen is
+     currently active, so "Print this report" printed the final
+     screen and the report itself (display:none) never appeared.
+     Force the report visible for print and hide everything else.
+  ============================================================ */
+  @media print{
+    .screen{display:none !important}
+    #screen-report{
+      display:block !important;
+      min-height:auto !important;
+      padding:0 !important;
+    }
+    #screen-report .report-cover{
+      background:#fff !important;
+      color:#1E1D1B !important;
+      padding:0 0 18px !important;
+      border-bottom:2px solid #B9924B;
+    }
+    #screen-report .report-cover h1,
+    #screen-report .report-cover .sub,
+    #screen-report .report-cover .eyebrow{color:#1E1D1B !important}
+    #screen-report .report-body{padding:0 !important;max-width:100% !important}
+    button,.btn-primary,.cal-btn,.skip-link,nav{display:none !important}
+    body{background:#fff !important}
+    .report-section{break-inside:avoid;page-break-inside:avoid}
   }
 </style>
 </head>
@@ -294,18 +327,21 @@
       <span class="skip-link" onclick="goTo('screen-done')">No thanks, I'm good</span>
     </div>
   </div>
-  <div class="wrap bonus-panel hidden" id="bonusPanel" style="max-width:560px">
-    <h3>Go deeper, on your own time</h3>
-    <label style="font-family:var(--ui);font-size:13px;color:var(--ink-soft);display:block;margin-bottom:4px">
-      Anything specific you're still confused about, or want to understand more? (optional)
-    </label>
-    <textarea id="bonusNote" rows="3" placeholder="Type it here if you've got something. Otherwise just copy the prompt below."></textarea>
-    <div style="text-align:center;margin-top:14px">
-      <button class="btn-primary" onclick="copyDeepenPrompt()">Copy my deepening prompt</button>
-      <div class="copy-confirm" id="copyConfirm">Copied. Open ChatGPT, Claude, or any AI you use, paste this in, then type "run this" so it knows to start.</div>
+  <div class="wrap bonus-panel hidden" id="bonusPanel" style="max-width:600px">
+    <h3>Keep going with an AI</h3>
+    <ol class="deepen-steps">
+      <li><strong>Tap Copy.</strong> Your whole prompt copies, with your answers already inside it.</li>
+      <li><strong>Open ChatGPT or Claude</strong> and paste it in.</li>
+      <li><strong>Send it.</strong> It starts on its own. Nothing else to type.</li>
+    </ol>
+    <label class="deepen-note-label">Still stuck on something? Add it first (optional)</label>
+    <textarea id="bonusNote" rows="2" placeholder="Optional. Leave blank if nothing comes to mind." oninput="fillDeepenBox()"></textarea>
+    <div style="text-align:center;margin-top:16px">
+      <button class="btn-primary" id="copyPromptBtn" onclick="copyDeepenPrompt()">Copy my prompt</button>
+      <div class="copy-confirm" id="copyConfirm">Copied. Now open ChatGPT or Claude, paste it in, and send.</div>
     </div>
-    <div id="bonusPromptDisplay" class="hidden" style="margin-top:20px"></div>
-    <textarea id="bonusPromptText" class="hidden"></textarea>
+    <p class="deepen-box-label">Your prompt (tap to select, then copy):</p>
+    <textarea id="bonusPromptText" class="deepen-prompt-box" readonly onclick="this.select()"></textarea>
     <div style="text-align:center;margin-top:18px">
       <button class="btn-primary" onclick="goTo('screen-done')">Continue</button>
     </div>
@@ -327,23 +363,76 @@
 
     <div class="wrap" style="padding:24px;max-width:520px">
       <div class="bonus-panel" style="margin-top:0">
-        <div class="label" style="font-family:var(--ui);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:14px">Keep this</div>
-        <button class="cal-btn" style="width:100%;margin-bottom:10px;text-align:center" onclick="window.print()">Print this report</button>
-        <button class="cal-btn" style="width:100%;text-align:center" onclick="emailMyself()">Email this to myself</button>
+        <div class="label" style="font-family:var(--ui);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:6px">Keep your report</div>
+        <p style="font-family:var(--ui);font-size:13.5px;color:var(--ink-soft);margin-bottom:14px;line-height:1.5">Save it as a PDF to keep forever, or email yourself a copy.</p>
+        <button class="cal-btn" style="width:100%;margin-bottom:10px;text-align:center" onclick="window.print()">Save my report as a PDF</button>
+        <button class="cal-btn" style="width:100%;text-align:center" onclick="emailMyself()">Email a copy to myself</button>
       </div>
     </div>
 
     <div class="wrap" style="padding:0 24px 40px;max-width:520px">
       <div class="bonus-panel" style="margin-top:0">
-        <div class="label" style="font-family:var(--ui);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:14px">What's next</div>
-        <a href="https://discovertheroot.com/purpose-next" style="display:block;text-align:center;padding:14px;background:var(--charcoal);color:var(--gold-soft);border-radius:6px;font-family:var(--ui);font-weight:600;font-size:14px;text-decoration:none;margin-bottom:10px">See what's possible next</a>
-        <a href="https://discovertheroot.com" style="display:block;text-align:center;padding:14px;border:1px solid var(--line);border-radius:6px;font-family:var(--ui);font-size:14px;color:var(--ink);text-decoration:none">See what else is here</a>
+        <div class="label" style="font-family:var(--ui);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:6px">Want to go further?</div>
+        <p style="font-family:var(--ui);font-size:13.5px;color:var(--ink-soft);margin-bottom:14px;line-height:1.5">If you're ready to get serious about this, let's talk.</p>
+        <!-- Book-a-call CTA -> your real contact/booking page (verified /contact). -->
+        <a href="https://discovertheroot.com/contact" style="display:block;text-align:center;padding:15px;background:var(--charcoal);color:var(--gold-soft);border-radius:6px;font-family:var(--ui);font-weight:600;font-size:15px;text-decoration:none;margin-bottom:10px">Book a call with me</a>
+        <a href="https://discovertheroot.com" style="display:block;text-align:center;padding:14px;border:1px solid var(--line);border-radius:6px;font-family:var(--ui);font-size:14px;color:var(--ink);text-decoration:none">See what else I do</a>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+/* ============================================================
+   GO HIGH LEVEL CONNECTION
+   Paste your GHL Inbound Webhook URL between the quotes below.
+   (GHL: Automation > Workflows > add "Inbound Webhook" trigger,
+    copy its URL.) Leave it "" to turn the connection off.
+   When set, the app sends the buyer's name + email when they
+   start, and again with their full report when it's ready, so
+   your workflow can save the contact and email them the report.
+============================================================ */
+const GHL_WEBHOOK_URL = "";
+
+function sendToGHL(payload){
+  if (!GHL_WEBHOOK_URL) return;              // off until you paste a URL
+  try {
+    fetch(GHL_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true                        // still sends if they navigate away
+    }).catch(function(){});                  // never let a CRM hiccup break the app
+  } catch(e){}
+}
+
+/* Flatten a finished report into plain text a GHL email can use. */
+function reportToPlainText(r){
+  if (!r) return "";
+  const line = (label, val) => label + ":\n" + val + "\n\n";
+  const list = (label, arr) => label + ":\n" + (arr||[]).map(x => "- " + x).join("\n") + "\n\n";
+  return (
+    userName + "'s Purpose Blueprint\n\n" +
+    line("Direction", r.direction_suggested) +
+    line("Opening Reflection", r.opening_reflection) +
+    list("Strongest Signals", r.strongest_signals) +
+    line("Then and Now", r.spark_throughline) +
+    line("Natural Role", r.natural_role) +
+    line("Who You Help", r.who_you_help) +
+    line("Problem You Solve", r.problem_you_solve) +
+    line("Story Thread", r.story_thread) +
+    line("Protective Pattern", r.protective_pattern) +
+    line("How It Helped", r.how_it_helped) +
+    line("Current Cost", r.current_cost) +
+    line("Business Direction", r.business_direction) +
+    list("Possibilities You Haven't Considered", r.unexpected_possibilities) +
+    line("30-Day Experiment", r.thirty_day_experiment) +
+    list("Micro-to-Macro Plan", r.micro_to_macro_plan) +
+    list("Reflection Questions", r.reflection_questions) +
+    line("Closing", r.closing)
+  ).trim();
+}
+
 /* ============================================================
    BOX BREATHING
 ============================================================ */
@@ -364,7 +453,7 @@ function stopBreathAndContinue(){
 }
 
 /* ============================================================
-   RUN LIMIT — two full runs per browser, tracked locally.
+   RUN LIMIT ‚Äî two full runs per browser, tracked locally.
    A run counts on a completed report, never on an abandoned attempt.
 ============================================================ */
 const RUN_LIMIT = 2;
@@ -416,6 +505,7 @@ let userEmail = "";
 function startInterview(){
   userName = document.getElementById('userName').value.trim();
   userEmail = document.getElementById('userEmail').value.trim();
+  sendToGHL({ event: "started", name: userName, email: userEmail });
   goTo('screen-interview');
   renderQuestion();
 }
@@ -1086,6 +1176,13 @@ function generateReport(){
     recordCompletedRun();
     renderReport(report);
     saveReportState();
+    sendToGHL({
+      event: "report_ready",
+      name: userName,
+      email: userEmail,
+      direction: report.direction_suggested,
+      report_text: reportToPlainText(report)
+    });
     goTo('screen-report');
   }).catch(err=>{
     clearInterval(cycle);
@@ -1162,7 +1259,7 @@ async function callSynthesis(){
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      max_tokens: 4096,
+      max_tokens: 8000,
       messages: [
         { role: "user", content: MASTER_PROMPT + "\n\nPERSON'S NAME: " + userName + "\n\nINTERVIEW ANSWERS:\n" + JSON.stringify(answers, null, 2) }
       ]
@@ -1244,7 +1341,7 @@ function renderReport(r){
       <p>${r.closing}</p>
       <div class="gold-line"></div>
       <p style="font-family:var(--ui);font-size:14px;color:var(--ink-soft);margin-top:24px">
-        <a href="https://discovertheroot.com/purpose-next" style="color:var(--gold);font-weight:600">See what's possible next</a>.
+        <a href="https://discovertheroot.com" style="color:var(--gold);font-weight:600">See what's possible next</a>.
       </p>
     </div>
   `;
@@ -1253,6 +1350,7 @@ function renderReport(r){
 function revealBonus(){
   document.getElementById('bonus-intro').classList.add('hidden');
   document.getElementById('bonusPanel').classList.remove('hidden');
+  fillDeepenBox();
 }
 
 function section(label, text){
@@ -1284,79 +1382,82 @@ function sectionList(label, arr, noDivider){
 /* ============================================================
    BONUS DEEPENING PROMPT
 ============================================================ */
-function buildDeepenPrompt(){
+/* Build the whole deepening prompt as ONE plain-text block, no labels,
+   with the buyer's own answers already inside, written so that pasting it
+   and sending it starts the conversation on its own (no "run this" step). */
+function buildDeepenText(){
   const r = currentReport;
   const note = document.getElementById('bonusNote').value.trim();
 
-  const context = `
-MY NAME: ${userName}
+  const guidance = [
+    "I have already done a full interview and gotten my Purpose Blueprint report. Everything below is already known, settled fact. Do not ask me the interview questions again, and do not repeat the report back to me, I have already read it. Your only job is to help me go deeper on what is still unclear or unresolved, using what is below as your starting point.",
+    "Draw on real, established thinking as you do this: Viktor Frankl on meaning being found through action, Carl Rogers on meeting someone accurately instead of diagnosing them, James Hillman on a calling that often shows up early in life before it gets buried by practicality, Gay Hendricks on the difference between being good at something and it actually being effortless, and Byron Katie's way of questioning a belief by asking what is actually true. You do not need to name these people to me, just let their thinking shape how you listen.",
+    "Listen for what is underneath what I say, not just the words. If I go quiet, rush past something, get vague, or deflect with a joke, gently slow down and ask about that specific moment instead of moving on.",
+    "Most people carry a core belief about themselves formed early on, and without realizing it they have spent years collecting evidence that proves it true, even when it was never fully accurate. Purpose work often gets pulled into this loop, where chasing a big enough purpose quietly becomes another way of trying to disprove that old belief instead of just being who I already am. If you notice me trying to prove something rather than simply describing something true, name it gently and ask about it.",
+    "Ego and purpose are not the same thing. Ego-driven answers tend to be about needing to be seen, to matter, to prove something. Real purpose tends to feel quiet and true even if no one ever noticed. If an answer sounds like it is about being validated, ask me whether it would still feel worth doing if no one ever found out.",
+    "Purpose and money get confused constantly, and they are not the same thing either. Ask me directly whether I am trying to find my purpose, or a way to make money doing something that just feels comfortable. Not everything that gives me purpose has to be paid. Help me see whether my purpose and my income actually need to be the same thing, or whether they are two separate parts of my life.",
+    "If I say something that sounds like a limiting belief about my own worth, question that belief the way you would question any assumption, by asking what is actually true, not by arguing with me.",
+    "Never tell me I have a special, grand, or destined purpose. That is usually just the ego loop wearing a nicer outfit. Ground everything in what is small, real, and specific, the thing that does not feel like work when I am doing it.",
+    "Go one question at a time. Wait for my answer before asking the next. Never give me a list of questions at once.",
+    "Near the end, ask me directly if I have any clarifying questions, or anything else that would help me find my purpose that we have not covered.",
+    "If, after real back and forth, I still feel stuck, tell me plainly that some things go deeper than AI can reach, and that talking to an actual person is a real option, not a failure. Suggest I book a call at discovertheroot.com/contact."
+  ].join("\n\n");
 
-MY PURPOSE BLUEPRINT FINDINGS:
-Direction: ${r.direction_suggested}
-Then and Now: ${r.spark_throughline}
-Natural Role: ${r.natural_role}
-Who I Help: ${r.who_you_help}
-Business Direction: ${r.business_direction}
-Possibilities I Haven't Considered: ${r.unexpected_possibilities.join(' | ')}
-Protective Pattern: ${r.protective_pattern}
-What This Is Costing Me: ${r.current_cost}
+  const about =
+    "Here is what is already known about me.\n\n" +
+    "My name is " + userName + ".\n\n" +
+    "My direction: " + r.direction_suggested + "\n\n" +
+    "The thread from what lit me up early to where I point now: " + r.spark_throughline + "\n\n" +
+    "My natural role: " + r.natural_role + "\n\n" +
+    "Who I help: " + r.who_you_help + "\n\n" +
+    "The direction for my work: " + r.business_direction + "\n\n" +
+    "Directions I had not considered: " + r.unexpected_possibilities.join("; ") + "\n\n" +
+    "My protective pattern: " + r.protective_pattern + "\n\n" +
+    "What it is costing me: " + r.current_cost + "\n\n" +
+    "In my own words, what lit me up as a kid: " + (answers['spark_open'] || "") + "\n\n" +
+    "In my own words, what I think my purpose might be: " + (answers['purpose_open'] || "") + "\n\n" +
+    "In my own words, what I am most afraid of: " + (answers['vuln_open'] || "") + "\n\n" +
+    "In my own words, the part of me I keep hidden: " + (answers['shadow_open'] || "") +
+    (note ? "\n\nWhat I am still confused about or want to understand more: " + note : "");
 
-MY OWN WORDS FROM THE INTERVIEW:
-The Spark: ${answers['spark_open'] || ''}
-Purpose: ${answers['purpose_open'] || ''}
-Vulnerability: ${answers['vuln_open'] || ''}
-Shadow: ${answers['shadow_open'] || ''}
-${note ? '\nWHAT I\'M STILL CONFUSED ABOUT OR WANT TO UNDERSTAND MORE: ' + note : ''}
-`.trim();
+  const start =
+    "Begin now. For your very first message, do not ask a deep question yet. First ask me plainly where I still feel stuck or confused, and give me a few concrete choices, for example: am I unclear about what I actually want to do, about my own pattern, or about how to turn my purpose into money. Once I pick one, go deeper on exactly that, using everything above.";
 
-  const chunks = [
-    {label:"The job", text:"I have already completed a full interview and already received my Purpose Blueprint report. Everything from that process is provided below as already known, settled fact. Do not ask me any of the interview questions again, not the ones about my values, my role, my childhood, my work, or anything else already answered below. Do not repeat the report back to me either, I've already read it. Your only job is to help me go deeper on what's still unclear or unresolved, using what's below as your starting point, not your first step."},
-    {label:"Who this draws from", text:"Draw on real, established thinking as you do this: Viktor Frankl on meaning being found through action, Carl Rogers on meeting someone accurately instead of diagnosing them, James Hillman on a calling often showing up early in life before it gets buried by practicality, Gay Hendricks on the difference between being good at something and it actually being effortless for you, and Byron Katie's method of questioning a belief by asking what's actually true. You don't need to name these people to me while we talk, just let their thinking shape how you listen and what you ask."},
-    {label:"How to listen", text:"Listen for what's underneath what I say, not just the words themselves. If I go quiet, rush past something, get vague, or deflect with a joke, gently slow down and ask about that specific moment instead of moving on."},
-    {label:"The Evidence Loop", text:"Most people carry a core belief about themselves formed early on, and without realizing it, they've spent years collecting evidence that proves that belief true, even when it was never fully accurate. Purpose work often gets pulled into this loop, chasing a big enough purpose can quietly become another way of trying to disprove that old belief, instead of just being who I already am. If you notice me trying to prove something rather than simply describing something true, name that gently and ask about it."},
-    {label:"Ego versus purpose", text:"These are not the same thing. Ego-driven answers tend to be about needing to be seen, needing to matter, needing to prove something. Real purpose tends to feel quiet and true even if no one ever noticed or praised it. If an answer sounds like it's about being validated, ask me: would this still feel true and worth doing if no one ever found out about it? That question tells the two apart."},
-    {label:"Purpose versus money", text:"These get confused constantly, and they are not the same thing either. As we talk, ask me directly: am I actually trying to find my purpose, or am I trying to find a way to make money doing something that just feels content and comfortable? Not everything that gives me a sense of purpose has to be something I get paid for. I might do paid work I genuinely enjoy, and still find my deepest sense of purpose somewhere completely unpaid, a hobby, a volunteer thing, something I'd do even if it never made a cent. Help me see whether my purpose and my income actually need to be the same thing, or whether they're two separate parts of my life that don't need to be merged."},
-    {label:"Belief check", text:"If I say something that sounds like a limiting belief about my own worth, question that belief the way you'd question any assumption, by asking what's actually true, not by arguing with me."},
-    {label:"Never do this", text:"Never tell me I have a special, grand, or destined purpose. That's often just the ego loop wearing a nicer outfit. Ground everything in what's small, real, and specific, the actual thing that doesn't feel like work when I'm doing it."},
-    {label:"Pace", text:"Go one question at a time. Wait for my answer before asking the next. Never give me a list of questions at once. If I mentioned something I'm still confused about, start there first. Your first question should build on what's already known below, never start over from the beginning."},
-    {label:"Before we wrap up", text:"Near the end of our conversation, ask me directly if I have any clarifying questions, or if there's anything else that would help me find my purpose that we haven't covered yet."},
-    {label:"If this doesn't fully work", text:"If, after real back and forth, I still feel stuck, tell me plainly that some things go deeper than AI can reach, and that it's a real option to talk to an actual person, not a failure to need that. Suggest I book a call at discovertheroot.com/work-with-me."}
-  ];
-
-  const instructions = chunks.map(c => c.label.toUpperCase() + ':\n' + c.text).join('\n\n') + `\n\nHere is my context:\n\nYOUR FIRST MESSAGE TO ME:\nDo not ask a deep question yet. First, ask me plainly where I still feel confused or stuck, and give me a few concrete options to choose from, something like: am I confused about what I actually want to do, am I confused about my own pattern, or am I confused about how to turn my purpose into money. Let me pick one of those, or tell you it's something else entirely. Once I answer, go deeper on exactly that, using everything above to guide how you dig in.\n\n${context}`;
-
-  const displayEl = document.getElementById('bonusPromptDisplay');
-  displayEl.innerHTML = chunks.map(c => `<div class="prompt-chunk"><div class="chunk-label">${c.label}</div><p>${c.text}</p></div>`).join('');
-  displayEl.classList.remove('hidden');
-
-  const textBox = document.getElementById('bonusPromptText');
-  textBox.value = instructions;
-
-  navigator.clipboard.writeText(instructions).then(()=>{
-    document.getElementById('copyConfirm').textContent = "Copied. Open ChatGPT, Claude, or any AI you use, paste this in, then type \"run this\" so it knows to start. It's also shown below if you need it again.";
-    document.getElementById('copyConfirm').style.display = 'block';
-  }).catch(()=>{
-    textBox.select();
-    document.getElementById('copyConfirm').textContent = "Couldn't copy automatically. The prompt is selected below, just press Ctrl+C or Cmd+C.";
-    document.getElementById('copyConfirm').style.display = 'block';
-  });
+  return guidance + "\n\n" + about + "\n\n" + start;
 }
+
+/* Show the current prompt in the on-screen box (called when the panel opens
+   and each time the optional note changes). */
+function fillDeepenBox(){
+  const box = document.getElementById('bonusPromptText');
+  if (box && currentReport) box.value = buildDeepenText();
+}
+
 function copyDeepenPrompt(){
-  buildDeepenPrompt();
+  const textBox = document.getElementById('bonusPromptText');
+  textBox.value = buildDeepenText();          // pick up anything typed in the note
+  const confirmEl = document.getElementById('copyConfirm');
+
+  const done = () => {
+    confirmEl.textContent = "Copied. Now open ChatGPT or Claude, paste it in, and send. It starts on its own.";
+    confirmEl.classList.add('show');
+  };
+  const manual = () => {
+    try { textBox.focus(); textBox.select(); } catch(e){}
+    confirmEl.textContent = "Select the prompt in the box below, copy it (press and hold, or Cmd/Ctrl+C), then paste it into ChatGPT or Claude and send.";
+    confirmEl.classList.add('show');
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(textBox.value).then(done).catch(manual);
+  } else {
+    manual();
+  }
 }
 
 function emailMyself(){
-  const r = currentReport;
   const subject = encodeURIComponent("My Purpose Blueprint Report");
-  const body = encodeURIComponent(
-`${userName}'s Purpose Blueprint
-
-Direction: ${r.direction_suggested}
-
-${r.closing}
-
-I'm rooting for you.`
-  );
+  const body = encodeURIComponent(reportToPlainText(currentReport) + "\n\nI'm rooting for you.");
   window.location.href = `mailto:${userEmail}?subject=${subject}&body=${body}`;
 }
 </script>
